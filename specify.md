@@ -15,7 +15,7 @@
 `질문 접수 → 핵심 정보 추출 → 라우팅 → 문서 검색 또는 정형 조회 또는 혼합 조회 → 결과 병합 → 답변 생성 → 응답 반환`
 
 #### 예외 처리 흐름
-`검색 결과 부족 / 라우팅 실패 / 조회 실패 / 권한 없음 → fallback 또는 예외 응답 → 로그 저장`
+`검색 결과 부족 / 라우팅 실패 / 조회 실패 / 권한 없음 발생 시 → fallback 또는 예외 응답 생성 → 로그 저장`
 
 ### 2.1 제품 목표
 1. 사내 규정, 절차, 가이드 문서의 검색 정확도를 높인다.
@@ -331,7 +331,7 @@ fallback 발생 조건
 - `title`: 문서명
 - `document_type`: 규정, 가이드, 매뉴얼 등 문서 유형
 - `owner_department`: 문서 담당 부서
-- `allowed_department` : 해당 문서를 조회할 수 있는 부서 정보
+- `allowed_department` : 해당 문서를 조회할 수 있는 부서 정보 (all | people_team | finance_team | it_team)
 - `version`: 문서 버전 정보
 - `effective_date`: 문서 시행일
 - `base_date`: 문서 기준일
@@ -389,35 +389,44 @@ fallback 발생 조건
 ### 9.5 공통 enum 정의
 
 #### route_type
-- rag
-- db_api
-- hybrid
-- unsupported
+- `rag`
+- `db_api`
+- `hybrid`
+- `unsupported`
 
 #### status
-- success
-- fallback
-- error
-- no_answer
+- `success`
+- `fallback`
+- `error`
+- `no_answer`
 
 #### document_status
-- pending
-- processing
-- completed
-- failed
-- reindex_required
+- `pending`
+- `processing`
+- `completed`
+- `failed`
+- `reindex_required`
 
 #### failure_reason
-- routing_failed
-- no_result
-- permission_denied
-- parse_failed
-- ocr_failed
-- embedding_failed
-- unknown
+- `routing_failed`
+- `no_result`
+- `permission_denied`
+- `parse_failed`
+- `ocr_failed`
+- `embedding_failed`
+- `unknown`
 
-
-[확인 필요] 권한 제어를 검색 후보 단계부터 적용하려면 ACL 관련 필드 또는 별도 권한 매핑 구조가 필요하다. 현재 문서에는 원칙은 있으나 스키마 상세는 부족하다.
+#### error_code
+- `NONE`
+- `PERMISSION_DENIED`
+- `ROUTING_FAILED`
+- `NO_RESULT`
+- `PARSE_FAILED`
+- `OCR_FAILED`
+- `EMBEDDING_FAILED`
+- `INDEX_SAVE_FAILED`
+- `DB_QUERY_FAILED`
+- `INTERNAL_ERROR`
 
 ---
 
@@ -451,7 +460,7 @@ fallback 발생 조건
 
 응답
 - document_id
-- status
+- document_status
 - created_at
 
 ### 10.3 문서 반영 요청 API
@@ -459,7 +468,7 @@ fallback 발생 조건
 
 응답
 - document_id
-- status
+- document_status
 - request_id
 
 ### 10.4 반영 상태 조회 API
@@ -467,12 +476,10 @@ fallback 발생 조건
 
 응답
 - document_id
-- status
+- document_status
 - error_code
 - error_message
 - updated_at
-
-[확인 필요] 혼합 조회 응답에서 `기준/절차`와 `현재 상태`를 분리 표시해야 하므로, 실제 응답 스키마에 `sections`, `time_basis`, `partial_answer`, `fallback_reason` 등의 필드가 추가로 필요할 수 있다.
 
 ---
 
@@ -506,7 +513,7 @@ fallback 발생 조건
 4. chunking 기준을 운영 규칙으로 잠글지
 5. 실패 사유 안내와 재처리 기능 범위를 어디까지 둘지
 6. 사전/동의어 사전 운영 주체를 누구로 둘지
-7. 로그 enum 및 API 응답 스키마를 어디까지 확장할지
+7. error_code 표준안과 API 응답 세부 스키마를 어디까지 확장할지
 
 ---
 
