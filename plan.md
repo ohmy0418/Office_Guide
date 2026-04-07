@@ -397,12 +397,9 @@ Pre-Retrieval → Retrieval → Post-Retrieval 구조의 문서 검색 파이프
 개발 중 병행해서 확인해야 할 이슈는 아래와 같다.
 
 1. 관리자 vs 권한 있는 내부 사용자 역할 체계 최종 확정
-2. ACL 상세 구조를 `allowed_department` 컬럼으로 시작할지, 별도 권한 매핑 구조를 둘지 결정
-3. route_type / status / document_status / failure_reason / error_code enum 표준안 확정
-4. 혼합 조회 응답 스키마 확정
-5. 실패 사유 안내만 제공할지, 재처리 기능까지 포함할지 결정
-6. 사전/동의어 사전 운영 주체와 반영 방식 확정
-7. chunk 검색 전략 병렬/순차 비교 결과 검토
+2. 실패 사유 안내만 제공할지, 재처리 기능까지 포함할지 결정
+3. 사전/동의어 사전 운영 주체와 반영 방식 확정
+4. chunk 검색 전략 병렬/순차 비교 결과 검토
 
 ---
 
