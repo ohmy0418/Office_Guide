@@ -27,8 +27,7 @@
 1. 운영 기능 권한을 `관리자만`으로 둘지, `권한 있는 내부 사용자`로 둘지 확정
 2. chunk 검색 기본 전략을 `병렬 검색`으로 확정할지 여부
 3. 실패 시 `실패 사유 안내만 제공`할지, `재처리 기능까지 포함`할지 여부
-4. ACL 적용 방식을 documents.allowed_department 컬럼 중심으로 시작할지, 별도 권한 매핑 구조로 시작할지 확정
-5. route_type / status / document_status / failure_reason / error_code enum 표준 확정
+4. route_type / status / document_status / failure_reason / error_code enum 표준 확정
 
 ---
 
