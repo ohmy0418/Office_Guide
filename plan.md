@@ -16,7 +16,7 @@
 - 혼합 조회는 기본적으로 병렬 처리하되, 의존 관계가 명확한 경우에만 순차 처리한다.
 - PDF 수정 반영은 전체 재색인을 기본으로 한다.
 - 운영 로그와 품질 평가 로그는 분리 저장한다.
-- 검색 기준선은 문서 후보 top 3, chunk 후보 top 10, rerank 4, 최종 context 4를 기본으로 한다.
+- 검색 기준선은 문서 후보 top 3, chunk 후보 top 10, rerank 6, 최종 context 4를 기본으로 한다.
 
 ---
 
@@ -57,7 +57,7 @@
 - v1 검색 기준선 확정
   - 문서 후보 top 3
   - chunk 후보 top 10
-  - rerank 4
+  - rerank 6
   - context 4
 - 결과 결합 기본값을 RRF로 확정
 - chunk 검색 기본 전략을 병렬 검색으로 잠정 확정
@@ -94,7 +94,6 @@
   - document_chunks
   - query_logs
   - retrieval_eval_logs
-  - allowed_department
 - 공통 상태값(enum) 정의
 - 공통 에러 응답 구조 정의
 
@@ -157,7 +156,7 @@
 
 #### 완료 기준
 - 문서 1건 업로드 후, `documents`와 `document_chunks`에 연결된 데이터가 저장되어야 한다.
-- 실패 시 `error_code`, `error_message`, `status`가 기록되어야 한다.
+- 실패 시 `error_code`, `error_message`, `status`, `failure_reason`가 기록되어야 한다.
 
 ---
 
@@ -229,7 +228,7 @@ Pre-Retrieval → Retrieval → Post-Retrieval 구조의 문서 검색 파이프
 
 #### 완료 기준
 - 문서형 질문에 대해 문서명, 조항/제목, 페이지를 포함하는 context를 생성할 수 있어야 한다.
-- 기본 기준선(top3/top10/rerank3/context4)이 코드 상에서 설정 가능해야 한다.
+- 기본 기준선(top3/top10/rerank6/context4)이 코드 상에서 설정 가능해야 한다.
 
 ---
 
@@ -249,7 +248,6 @@ Pre-Retrieval → Retrieval → Post-Retrieval 구조의 문서 검색 파이프
   - 조직 구조 조회
   - 연락처/이메일 조회
   - 담당자/담당 부서 조회
-- 권한 필터 적용
 
 #### 혼합 조회
 - 질문 분해 구현
@@ -258,7 +256,7 @@ Pre-Retrieval → Retrieval → Post-Retrieval 구조의 문서 검색 파이프
 - 병렬 fan-out 및 결과 merge 구현
 - 의존 관계 질문의 순차 실행 처리
 - 문서 기준일/정형 조회 시점 병합 표시
-- sections / time_basis / fallback_reason 구조 구현
+- sections / time_basis / failure_reason 구조 구현
 
 #### 산출물
 - structured lookup 모듈
@@ -293,6 +291,7 @@ Pre-Retrieval → Retrieval → Post-Retrieval 구조의 문서 검색 파이프
   - latency_ms
   - error_code
   - error_message
+  - failure_reason
 - 품질 평가 로그 저장 구조 구현
 
 #### 산출물
@@ -330,7 +329,7 @@ Pre-Retrieval → Retrieval → Post-Retrieval 구조의 문서 검색 파이프
 
 #### 완료 기준
 - 문서 업로드 후 상태를 조회할 수 있어야 한다.
-- 실패 상태에서 오류 코드와 메시지를 확인할 수 있어야 한다.
+- 실패 상태에서 오류 코드와 메시지, 실패 원인을 확인할 수 있어야 한다.
 
 ---
 
@@ -371,7 +370,7 @@ Pre-Retrieval → Retrieval → Post-Retrieval 구조의 문서 검색 파이프
 - 문서 업로드 → 인덱싱 → 검색 → 답변까지 E2E 테스트
 - 문서형 / 정형 조회형 / 혼합 조회형 시나리오 테스트
 - fallback 시나리오 테스트
-- 권한 필터 테스트
+- 운영 기능 관리자 권한 테스트
 - API 응답 스키마 검증
 - 로그 누락 여부 확인
 - 성능 점검
@@ -386,7 +385,7 @@ Pre-Retrieval → Retrieval → Post-Retrieval 구조의 문서 검색 파이프
 
 #### 완료 기준
 - 핵심 시나리오가 모두 정상 동작해야 한다.
-- fallback, 권한 필터, 로그 기록이 누락 없이 동작해야 한다.
+- fallback, 운영 기능 관리자 권한 검증, 로그 기록이 누락 없이 동작해야 한다.
 - v1 릴리스 범위 내 기능이 문서와 실제 구현에서 일치해야 한다.
 
 ---

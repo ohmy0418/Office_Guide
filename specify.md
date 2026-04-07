@@ -60,7 +60,7 @@
 
 ### 4.1 일반 사용자
 - 규정, 절차, 가이드, 담당 부서/담당자, 조직/구성원 정보를 조회할 수 있다.
-- 본인 권한 범위 내 문서 및 정형 데이터만 조회할 수 있다.
+- v1에서는 공개 대상 문서 및 정형 데이터를 조회할 수 있다.
 
 ### 4.2 관리자
 - 문서 업로드
@@ -69,9 +69,9 @@
 - 실패 사유 확인
 
 ### 4.3 권한 원칙
-- 모든 응답은 요청 사용자 권한 기준으로 필터링한다.
-- 권한 밖 문서, 권한 밖 정형 데이터, 관리자 전용 기능은 노출하지 않는다.
-- 권한 검증은 문서 검색, 정형 조회, 응답 생성, 운영 기능 전반에 적용한다.
+- v1에서는 콘텐츠 ACL을 적용하지 않으며, 운영 기능에만 관리자 권한을 적용한다.
+- 관리자 전용 기능은 일반 사용자에게 노출하지 않는다.
+- 권한 검증은 운영 기능(API, 운영 화면)에 적용한다.
 
 [확인 필요] FRD/TRD의 오픈 이슈에는 `운영자 권한`과 `권한 있는 내부 사용자` 표현이 남아 있다. v1은 우선 `관리자만 운영 기능 접근 가능` 기준으로 작성했으나, 회의에서 역할 체계 최종 확정이 필요하다.
 
@@ -111,7 +111,7 @@
 ### 6.2 검색 기준선
 - 문서 후보 수: top 3
 - chunk 후보 수: top 10
-- rerank 대상 수: 4
+- rerank 대상 수: 6
 - 최종 context 기본값: 상위 4개 chunk
 - 품질 지표 목표: Recall@k 우선, Recall 최소 0.8 지향
 
@@ -208,7 +208,6 @@ v1 chunking 우선순위
 입력
 - 사용자 자연어 질문
 - 사용자 식별값
-- 사용자 권한 정보
 
 처리 규칙
 1. 라우팅 전에 최소 핵심 정보를 먼저 추출한다.
@@ -250,7 +249,7 @@ v1 chunking 우선순위
 #### Retrieval
 - 하이브리드 검색
 - 키워드 검색: PostgreSQL Full Text Search
-- 키워드 랭킹: BM25 계열
+- 키워드 랭킹: 랭킹은 FTS 기본 랭킹으로 시작하고, BM25 계열 고도화는 후속 검토
 - 유사도 검색: pgvector
 - 메타데이터 필터 적용
 - 문서 후보 검색 → chunk 후보 검색 → 결과 결합
@@ -274,7 +273,6 @@ v1 chunking 우선순위
 - 담당자/담당 부서 조회
 
 보안 제한
-- 권한 밖 정보 제거
 - 조회 실패 시 부분 답변 또는 fallback
 - 무제한 Text-to-SQL 미허용
 
@@ -331,7 +329,6 @@ fallback 발생 조건
 - `title`: 문서명
 - `document_type`: 규정, 가이드, 매뉴얼 등 문서 유형
 - `owner_department`: 문서 담당 부서
-- `allowed_department` : 해당 문서를 조회할 수 있는 부서 정보 
 - `version`: 문서 버전 정보
 - `effective_date`: 문서 시행일
 - `base_date`: 문서 기준일
@@ -391,43 +388,54 @@ fallback 발생 조건
 ### 9.5 공통 enum 정의
 
 #### route_type
-- `rag`
-- `db_api`
-- `hybrid`
-- `unsupported`
+질문이 어떤 처리 경로로 분기되었는지 나타내는 값
+
+- `rag`: 문서 검색(RAG) 중심 처리
+- `db_api`: 정형 데이터(SQL/API) 중심 처리
+- `hybrid`: 문서 검색 + 정형 조회 혼합 처리
+- `unsupported`: 처리 불가 / 범위 외 질문
 
 #### status
-- `success`
-- `fallback`
-- `error`
+질문 처리 결과 상태를 나타내는 값
+
+- `success`: 정상적으로 답변 생성 완료
+- `fallback`: 충분한 근거가 없어 fallback 응답으로 전환
+- `error`: 시스템 또는 처리 오류로 정상 응답 실패
 
 #### document_status
-- `pending`
-- `processing`
-- `completed`
-- `failed`
-- `reindex_required`
+문서 반영(ingestion) 처리 상태를 나타내는 값
+
+- `pending`: 업로드 완료, 반영 대기 상태
+- `processing`: 반영 처리 진행 중
+- `completed`: 반영 완료
+- `failed`: 반영 실패
+- `reindex_required`: 재색인 필요 상태
 
 #### failure_reason
-- `routing_failed`
-- `no_result`
-- `permission_denied`
-- `parse_failed`
-- `ocr_failed`
-- `embedding_failed`
-- `unknown`
+실패의 상위 원인을 의미 기준으로 분류하는 값  
+사용처: 사용자 질문 응답, 운영 로그, 문서 반영 실패 원인 기록
 
-#### error_code
-- `null`
-- `PERMISSION_DENIED`
-- `ROUTING_FAILED`
-- `NO_RESULT`
-- `PARSE_FAILED`
-- `OCR_FAILED`
-- `EMBEDDING_FAILED`
-- `INDEX_SAVE_FAILED`
-- `DB_QUERY_FAILED`
-- `INTERNAL_ERROR`
+- `routing_failed`: 질문 라우팅 결정 실패
+- `no_result`: 검색/조회 결과 부족
+- `permission_denied`: 권한 부족으로 처리 불가
+- `parse_failed`: 문서 파싱 실패
+- `ocr_failed`: OCR 처리 실패
+- `embedding_failed`: 임베딩 생성 실패
+- `unknown`: 원인 분류 불가
+
+#### error_code (시스템 처리/추적용 코드)
+시스템 처리, 운영 추적, 디버깅을 위한 구체 오류 코드  
+사용처: 운영 로그, 문서 상태 조회 API, 장애 분석
+
+- `PERMISSION_DENIED`: 권한 부족
+- `ROUTING_FAILED`: 라우팅 처리 실패
+- `NO_RESULT`: 검색/조회 결과 없음
+- `PARSE_FAILED`: 문서 파싱 실패
+- `OCR_FAILED`: OCR 처리 실패
+- `EMBEDDING_FAILED`: 임베딩 생성 실패
+- `INDEX_SAVE_FAILED`: 인덱스 저장 실패
+- `DB_QUERY_FAILED`: DB/API 조회 실패
+- `INTERNAL_ERROR`: 기타 내부 시스템 오류
 
 ---
 
@@ -479,6 +487,7 @@ fallback 발생 조건
 - document_status
 - error_code
 - error_message
+- failure_reason
 - updated_at
 
 ---
