@@ -4,3 +4,4 @@ dist
 build
 __pycache__
 *.pdf
+docs/folder.md
