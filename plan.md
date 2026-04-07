@@ -260,6 +260,7 @@ Pre-Retrieval → Retrieval → Post-Retrieval 구조의 문서 검색 파이프
 - 병렬 fan-out 및 결과 merge 구현
 - 의존 관계 질문의 순차 실행 처리
 - 문서 기준일/정형 조회 시점 병합 표시
+- sections / time_basis / fallback_reason 구조 구현
 
 #### 산출물
 - structured lookup 모듈
@@ -295,9 +296,6 @@ Pre-Retrieval → Retrieval → Post-Retrieval 구조의 문서 검색 파이프
   - error_code
   - error_message
 - 품질 평가 로그 저장 구조 구현
-- sections 구조 구현
-- time_basis 구조 구현
--fallback_reason 응답 필드 구현
 
 #### 산출물
 - answer builder
