@@ -30,6 +30,12 @@ uvicorn app.main:app --reload
 
 `.env`에 `OPENAI_API_KEY`를 설정해야 임베딩이 동작한다. 텍스트가 거의 없는 PDF는 **OCRmyPDF**(`ocrmypdf` 명령, Tesseract 등 시스템 의존)를 사용한다.
 
+### Phase 3 — 질문 분석·라우팅
+
+- `POST /api/v1/questions` — 본문 JSON: `question`, `user_id` (docs/specify.md 10.1)
+- 규칙 기반 `route_type`(rag / db_api / hybrid / unsupported), 핵심 정보 추출, 동의어 정규화 초안
+- 처리 결과는 `query_logs`에 저장됨 (답변 본문은 Phase 4~6에서 검색·조회와 연동)
+
 ## 테스트
 
 ```bash
