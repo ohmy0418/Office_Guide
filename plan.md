@@ -16,7 +16,7 @@
 - 혼합 조회는 기본적으로 병렬 처리하되, 의존 관계가 명확한 경우에만 순차 처리한다.
 - PDF 수정 반영은 전체 재색인을 기본으로 한다.
 - 운영 로그와 품질 평가 로그는 분리 저장한다.
-- 검색 기준선은 문서 후보 top 3, chunk 후보 top 10, rerank 3, 최종 context 4를 기본으로 한다.
+- 검색 기준선은 문서 후보 top 3, chunk 후보 top 10, rerank 4, 최종 context 4를 기본으로 한다.
 
 ---
 
@@ -57,7 +57,7 @@
 - v1 검색 기준선 확정
   - 문서 후보 top 3
   - chunk 후보 top 10
-  - rerank 3
+  - rerank 4
   - context 4
 - 결과 결합 기본값을 RRF로 확정
 - chunk 검색 기본 전략을 병렬 검색으로 잠정 확정
@@ -94,7 +94,6 @@
   - document_chunks
   - query_logs
   - retrieval_eval_logs
-- documents 스키마에 권한 필터용 컬럼 반영
   - allowed_department
 - 공통 상태값(enum) 정의
 - 공통 에러 응답 구조 정의
@@ -376,7 +375,7 @@ Pre-Retrieval → Retrieval → Post-Retrieval 구조의 문서 검색 파이프
 - API 응답 스키마 검증
 - 로그 누락 여부 확인
 - 성능 점검
-  - top3/top10/rerank3/context4 기준 동작 확인
+  - top3/top10/rerank6/context4 기준 동작 확인
   - latency 측정
 - 릴리스 체크리스트 작성
 

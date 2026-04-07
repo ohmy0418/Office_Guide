@@ -111,7 +111,7 @@
 ### 6.2 검색 기준선
 - 문서 후보 수: top 3
 - chunk 후보 수: top 10
-- rerank 대상 수: 3
+- rerank 대상 수: 4
 - 최종 context 기본값: 상위 4개 chunk
 - 품질 지표 목표: Recall@k 우선, Recall 최소 0.8 지향
 
@@ -331,7 +331,7 @@ fallback 발생 조건
 - `title`: 문서명
 - `document_type`: 규정, 가이드, 매뉴얼 등 문서 유형
 - `owner_department`: 문서 담당 부서
-- `allowed_department` : 해당 문서를 조회할 수 있는 부서 정보 (all | people_team | finance_team | it_team)
+- `allowed_department` : 해당 문서를 조회할 수 있는 부서 정보 
 - `version`: 문서 버전 정보
 - `effective_date`: 문서 시행일
 - `base_date`: 문서 기준일
@@ -343,6 +343,7 @@ fallback 발생 조건
 - `updated_at`: 문서 정보 최종 수정 시각
 - `error_code`: 반영 실패 시 오류 코드
 - `error_message`: 반영 실패 시 오류 메시지
+- `failure_reason`: 실패 원인 
 
 ### 9.2 document_chunks
 필수 컬럼 예시
@@ -371,6 +372,7 @@ fallback 발생 조건
 - `latency_ms`: 요청 처리 시간(ms)
 - `error_code`: 오류 코드
 - `error_message`: 오류 메시지
+- `failure_reason`: 실패 원인
 - `created_at`: 요청 발생 시각
 
 ### 9.4 retrieval_eval_logs
@@ -398,7 +400,6 @@ fallback 발생 조건
 - `success`
 - `fallback`
 - `error`
-- `no_answer`
 
 #### document_status
 - `pending`
@@ -417,7 +418,7 @@ fallback 발생 조건
 - `unknown`
 
 #### error_code
-- `NONE`
+- `null`
 - `PERMISSION_DENIED`
 - `ROUTING_FAILED`
 - `NO_RESULT`
@@ -438,7 +439,6 @@ fallback 발생 조건
 요청
 - question
 - user_id
-- session_id
 
 응답
 - request_id
@@ -449,7 +449,7 @@ fallback 발생 조건
 - sections
 - time_basis
 - partial_answer
-- fallback_reason
+- failure_reason
 
 ### 10.2 문서 업로드 API
 `POST /api/v1/documents/upload`
