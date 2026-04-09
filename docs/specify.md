@@ -319,9 +319,14 @@ fallback 발생 조건
 
 ## 9. 데이터 구조 명세
 
+### 9.0 네이밍·식별자 공통 규칙 (팀 합의)
+
+- **이름 통일**: DB 컬럼명 = 애플리케이션 코드(모델) 속성명 = **가능하면** API 응답·요청 JSON 필드명을 같게 맞춘다.
+- **문서·청크 ID**: `document_id`, `chunk_id`는 **UUID** 타입(또는 그에 준하는 고유 식별자)을 사용한다.
+
 ### 9.1 documents
 필수 컬럼 예시
-- `document_id`: 문서를 구분하는 고유 ID
+- `document_id`: 문서를 구분하는 고유 ID(**UUID**)
 - `title`: 문서명
 - `document_type`: 규정, 가이드, 매뉴얼 등 문서 유형
 - `owner_department`: 문서 담당 부서
@@ -340,8 +345,8 @@ fallback 발생 조건
 
 ### 9.2 document_chunks
 필수 컬럼 예시
-- `chunk_id`: chunk를 구분하는 고유 ID
-- `document_id`: 원본 문서와 연결되는 ID
+- `chunk_id`: chunk를 구분하는 고유 ID(**UUID**)
+- `document_id`: 원본 문서와 연결되는 ID(**UUID**, `documents.document_id` FK)
 - `chunk_order`: 문서 내 chunk 순서
 - `heading`: chunk 제목 또는 조항명
 - `heading_path`: 상위 제목 경로
